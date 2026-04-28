@@ -1,52 +1,59 @@
-package physics
+// physics.go
+package main
 
 import "math"
 
-const Gravity = 9.81 // Example gravity for simulation context
+const (
+	Gravity = 9.8  // Simplified gravity for demonstration
+	MaxSpeed = 10.0
+	Friction = 0.9  // Velocity decay factor
+)
 
-type Vector2 struct {
-	X float64
-	Y float64
+// Physics handles the simulation of the game world.
+type Physics struct {
+	Player *Player
+	G      float64
 }
 
-type RigidBody struct {
-	Position Vector2
-	Velocity Vector2
-	Mass     float64
-	IsGrounded bool
-}
-
-func NewRigidBody(x, y float64) *RigidBody {
-	return &RigidBody{
-		Position: Vector2{X: x, Y: y},
-		Velocity: Vector2{X: 0, Y: 0},
-		Mass:     1.0,
-		IsGrounded: false,
+// NewPhysics initializes the physics system.
+func NewPhysics(p *Player) *Physics {
+	return &Physics{
+		Player: p,
+		G:      Gravity,
 	}
 }
 
-// ApplyForce applies an impulse to the body.
-func (rb *RigidBody) ApplyForce(force Vector2) {
-	// Simplified: Force = Mass * Acceleration (a = F/m)
-	acceleration := Vector2{X: force.X / rb.Mass, Y: force.Y / rb.Mass}
-	rb.Velocity.X += acceleration.X
-	rb.Velocity.Y += acceleration.Y
-}
-
-// Update applies gravity and updates position based on velocity.
-func (rb *RigidBody) Update(deltaTime float64) {
+// Update applies physics simulation to the player.
+func (p *Physics) Update(deltaTime float64) {
 	// Apply gravity
-	gravityForce := Vector2{X: 0, Y: -Gravity} // Assuming Y is down in game terms or adjusting for positive Y up
-	rb.ApplyForce(gravityForce)
+	p.Player.VelocityY += p.G * deltaTime
 
-	// Update position
-	rb.Position.X += rb.Velocity.X * deltaTime
-	rb.Position.Y += rb.Velocity.Y * deltaTime
+	// Apply friction/damping to horizontal velocity
+	p.Player.VelocityX *= Friction
 
-	// Simple ground check placeholder (needs collision system)
-	if rb.Position.Y > 0 { // Assuming ground is at Y=0
-		rb.Position.Y = 0
-		rb.Velocity.Y = 0
-		rb.IsGrounded = true
+	// Apply movement based on velocity
+	p.Player.X += p.Player.VelocityX * deltaTime
+	p.Player.Y += p.Player.VelocityY * deltaTime
+
+	// Clamp velocity to MaxSpeed
+	if math.Abs(p.Player.VelocityX) > MaxSpeed {
+		p.Player.VelocityX = math.Copysign(MaxSpeed, p.Player.VelocityX)
+	}
+	if math.Abs(p.Player.VelocityY) > MaxSpeed {
+		p.Player.VelocityY = math.Copysign(MaxSpeed, p.Player.VelocityY)
+	}
+
+	// Basic ground detection placeholder (needs refinement)
+	if p.Player.Y > 100.0 { // Placeholder for ground collision
+		p.Player.Y = 100.0
+		p.Player.VelocityY = 0.0
+		p.Player.IsGrounded = true
+	} else {
+		p.Player.IsGrounded = false
+	}
+
+	// Momentum calculation (simplified)
+	if p.Player.VelocityX != 0 || p.Player.VelocityY != 0 {
+		p.Player.Momentum += math.Sqrt(p.Player.VelocityX*p.Player.VelocityX + p.Player.VelocityY*p.Player.VelocityY)
 	}
 }
