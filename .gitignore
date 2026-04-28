@@ -1,0 +1,5 @@
+.engine/
+.cache/
+*.db
+*.db-wal
+*.db-shm
