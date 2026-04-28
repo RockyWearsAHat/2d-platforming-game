@@ -1,0 +1,100 @@
+{
+  "version": "v1",
+  "requestId": "1777365850555579000-0",
+  "sessionId": "scaffold-2d-platforming-game-1777365536691667000",
+  "projectPath": "/Users/alexwaldmann/Desktop/MyEditor/engine/projects/RockyWearsAHat-2d-platforming-game",
+  "objective": {
+    "statement": "The GitHub repository RockyWearsAHat/2d-platforming-game needs an end-to-end autonomous build from its README.",
+    "priority": "high"
+  },
+  "scope": {
+    "inScope": [
+      "The GitHub repository RockyWearsAHat/2d-platforming-game needs an end-to-end autonomous build from its README."
+    ],
+    "outScope": [
+      "Deploy/publish actions unless explicit publish intent evidence is present"
+    ]
+  },
+  "constraints": [
+    "Preserve existing behavior unless user requests a behavior change",
+    "Run project-appropriate verification before completion",
+    "Do not deploy/publish without explicit intent evidence",
+    "Honor user-stated prohibitions exactly"
+  ],
+  "successCriteria": {
+    "items": [
+      "The GitHub repository RockyWearsAHat/2d-platforming-game needs an end-to-end autonomous build from its README",
+      "Execution contract (must complete all phases):",
+      "Understand",
+      "- Read local README first: /Users/alexwaldmann/Desktop/MyEditor/engine/projects/RockyWearsAHat-2d-platforming-game/README",
+      "- If missing/stale, fetch latest README with shell: curl -s https://raw",
+      "githubusercontent"
+    ],
+    "completionDefinition": "all success criteria met and verification passes"
+  },
+  "projectProfile": {
+    "projectPath": "/Users/alexwaldmann/Desktop/MyEditor/engine/projects/RockyWearsAHat-2d-platforming-game",
+    "type": "web-app",
+    "doneDefinition": [
+      "The GitHub repository RockyWearsAHat/2d-platforming-game needs an end-to-end autonomous build from its README",
+      "Execution contract (must complete all phases):",
+      "Understand",
+      "- Read local README first: /Users/alexwaldmann/Desktop/MyEditor/engine/projects/RockyWearsAHat-2d-platforming-game/README",
+      "- If missing/stale, fetch latest README with shell: curl -s https://raw",
+      "githubusercontent"
+    ],
+    "deployTarget": "local",
+    "verification": {
+      "usesPlaywright": true,
+      "startCmd": "pnpm dev",
+      "checkURL": "http://localhost:3000",
+      "port": 3000,
+      "checkCmds": null
+    },
+    "liveCheckCmd": "curl -sf http://localhost:3000",
+    "executionIntent": {
+      "publishIntent": "none",
+      "publishEvidence": null
+    },
+    "workingBehaviors": [
+      "User can the github repository rockywearsahat/2d-platforming-game needs an end-to-end autonomous build from its readme",
+      "User can execution contract (must complete all phases):",
+      "User can understand",
+      "User can - read local readme first: /users/alexwaldmann/desktop/myeditor/engine/projects/rockywearsahat-2d-platforming-game/readme",
+      "User can - if missing/stale, fetch latest readme with shell: curl -s https://raw",
+      "User can githubusercontent"
+    ]
+  },
+  "executionIntent": {
+    "publishIntent": "none",
+    "publishEvidence": null
+  },
+  "style": {
+    "explicitStyleProvided": false,
+    "assumedStyle": "convention-safe default",
+    "assumptionNoticeSent": {
+      "chat": true,
+      "discord": true
+    }
+  },
+  "continuity": {
+    "completedSteps": [
+      "request intake captured",
+      "pre-start expansion generated",
+      "latest summary updated"
+    ],
+    "nextStep": "execute highest-priority implementation step and run verification",
+    "knownRisks": [
+      "publish/deploy is denied until explicit evidence is provided"
+    ],
+    "unresolvedQuestions": null
+  },
+  "observability": {
+    "canaryEnabled": false,
+    "killSwitches": [
+      "publish-intent-gate",
+      "minimal-chat-policy"
+    ],
+    "traceId": "1777365850555579000-0"
+  }
+}

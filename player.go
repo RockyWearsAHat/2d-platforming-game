@@ -1,81 +1,50 @@
-// /Users/alexwaldmann/Desktop/MyEditor/engine/projects/RockyWearsAHat-2d-platforming-game/player.go
 package main
 
-import "math"
-
-const (
-	MoveSpeed      = 300.0
-	JumpStrength   = 500.0
-	Gravity        = 9.81
-	Friction       = 0.9
-	AirControl     = 0.1  // Air resistance/control factor
+import (
+	"fmt"
+	"time"
 )
 
+// Player represents the player character.
 type Player struct {
-	Body *RigidBody
-	JumpCount int
+	ID       int
+	Name     string
+	Physics  *physics.RigidBody
+	Speed    float64
+	JumpForce float64
 }
 
-func NewPlayer(x, y float64) *Player {
-	body := NewRigidBody(x, y)
+func NewPlayer(id int, name string, initialX, initialY float64) *Player {
 	return &Player{
-		Body: body,
-		JumpCount: 0,
+		ID:       id,
+		Name:     name,
+		Physics:  physics.NewRigidBody(initialX, initialY),
+		Speed:    5.0,       // Base horizontal speed
+		JumpForce: 15.0,     // Initial jump force
 	}
 }
 
-func (p *Player) ApplyMovement(dx, dy float64) {
-	// Horizontal movement
-	acceleration := Vector2{X: dx / p.Body.Mass, Y: 0}
-	p.Body.ApplyForce(acceleration)
+// Update handles player input and physics application.
+func (p *Player) Update(deltaTime float64, inputX float64, inputJump bool) {
+	// Horizontal movement (Momentum driven)
+	moveVector := physics.Vector2{X: inputX * p.Speed, Y: 0}
+	p.Physics.ApplyForce(moveVector)
 
-	// Apply friction/damping for horizontal movement
-	p.Body.Velocity.X *= Friction
+	// Jumping
+	if inputJump {
+		p.Physics.ApplyForce(physics.Vector2{X: 0, Y: p.JumpForce})
+	}
 
-	// Vertical movement (gravity handled in Update)
-	p.Body.Velocity.Y += p.Body.Acceleration.Y // Apply current acceleration derived from gravity
-
-	// Apply movement to position
-	p.Body.Position.X += p.Body.Velocity.X * 0.016 // dt approximation (assuming 60 FPS -> dt approx 1/60 ~ 0.0167)
-	p.Body.Position.Y += p.Body.Velocity.Y * 0.016
+	// Apply physics updates
+	p.Physics.Update(deltaTime)
 }
 
-func (p *Player) Jump() bool {
-	if p.Body.IsGrounded {
-		p.Body.Velocity.Y = JumpStrength
-		p.Body.IsGrounded = false
-		p.JumpCount++
-		return true
-	}
-	return false
-}
-
-func (p *Player) Update(dt float64) {
-	// Apply gravity (only if not grounded)
-	if !p.Body.IsGrounded {
-		p.Body.Acceleration.Y += Gravity / p.Body.Mass
-	}
-
-	// Apply air control
-	if !p.Body.IsGrounded {
-		horizontalInput := 0.0
-		if p.Body.Velocity.X != 0 {
-			// Simulate horizontal control based on input (simplified: direct adjustment)
-			// In a real game, this would involve reading input state.
-			horizontalInput = math.Sin(p.Body.Velocity.X/100.0) * AirControl
-			p.Body.Acceleration.X += horizontalInput / p.Body.Mass
-		}
-	}
-
-
-	// Update position based on velocity
-	p.Body.Position.X += p.Body.Velocity.X * dt
-	p.Body.Position.Y += p.Body.Velocity.Y * dt
-
-	// Simple ground check (needs proper collision handling later)
-	if p.Body.Position.Y > 500 { // Arbitrary ground level check
-		p.Body.Position.Y = 500
-		p.Body.Velocity.Y = 0
-		p.Body.IsGrounded = true
-	}
+func (p *Player) String() string {
+	return fmt.Sprintf("Player {%s, Pos: (%.2f, %.2f), Vel: (%.2f, %.2f), Grounded: %t}",
+		p.Name,
+		p.Physics.Position.X,
+		p.Physics.Position.Y,
+		p.Physics.Velocity.X,
+		p.Physics.Velocity.Y,
+		p.Physics.IsGrounded)
 }

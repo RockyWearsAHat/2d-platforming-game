@@ -1,17 +1,18 @@
-// /Users/alexwaldmann/Desktop/MyEditor/engine/projects/RockyWearsAHat-2d-platforming-game/physics.go
-package main
+package physics
 
 import "math"
 
+const Gravity = 9.81 // Example gravity for simulation context
+
 type Vector2 struct {
-	X, Y float64
+	X float64
+	Y float64
 }
 
 type RigidBody struct {
 	Position Vector2
 	Velocity Vector2
-	Acceleration Vector2
-	Mass float64
+	Mass     float64
 	IsGrounded bool
 }
 
@@ -19,29 +20,33 @@ func NewRigidBody(x, y float64) *RigidBody {
 	return &RigidBody{
 		Position: Vector2{X: x, Y: y},
 		Velocity: Vector2{X: 0, Y: 0},
-		Acceleration: Vector2{X: 0, Y: 0},
-		Mass: 1.0,
+		Mass:     1.0,
 		IsGrounded: false,
 	}
 }
 
+// ApplyForce applies an impulse to the body.
 func (rb *RigidBody) ApplyForce(force Vector2) {
-	// F = ma => a = F/m
-	rb.Acceleration.X += force.X / rb.Mass
-	rb.Acceleration.Y += force.Y / rb.Mass
+	// Simplified: Force = Mass * Acceleration (a = F/m)
+	acceleration := Vector2{X: force.X / rb.Mass, Y: force.Y / rb.Mass}
+	rb.Velocity.X += acceleration.X
+	rb.Velocity.Y += acceleration.Y
 }
 
-func (rb *RigidBody) Update(dt float64) {
-	// Apply acceleration to velocity
-	rb.Velocity.X += rb.Acceleration.X * dt
-	rb.Velocity.Y += rb.Acceleration.Y * dt
+// Update applies gravity and updates position based on velocity.
+func (rb *RigidBody) Update(deltaTime float64) {
+	// Apply gravity
+	gravityForce := Vector2{X: 0, Y: -Gravity} // Assuming Y is down in game terms or adjusting for positive Y up
+	rb.ApplyForce(gravityForce)
 
-	// Apply velocity to position
-	rb.Position.X += rb.Velocity.X * dt
-	rb.Position.Y += rb.Velocity.Y * dt
+	// Update position
+	rb.Position.X += rb.Velocity.X * deltaTime
+	rb.Position.Y += rb.Velocity.Y * deltaTime
 
-	// Simple gravity simulation (assuming Y is up/down for simplicity in this core)
-	// Let's assume Y increases downwards for screen coordinates, hence gravity pulls down.
-	const gravity = 9.81 // Example gravity constant
-	rb.Acceleration.Y += gravity / rb.Mass
+	// Simple ground check placeholder (needs collision system)
+	if rb.Position.Y > 0 { // Assuming ground is at Y=0
+		rb.Position.Y = 0
+		rb.Velocity.Y = 0
+		rb.IsGrounded = true
+	}
 }

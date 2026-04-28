@@ -1,45 +1,46 @@
-// /Users/alexwaldmann/Desktop/MyEditor/engine/projects/RockyWearsAHat-2d-platforming-game/level.go
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
-type Platform struct {
-	X, Y float64
-	Width, Height float64
-}
-
+// Level represents the game environment.
 type Level struct {
-	Platforms []Platform
-	Score int
+	Width  float64
+	Height float64
+	Blocks map[string]bool // Simple representation of world geometry/blocks
 }
 
-func NewLevel() *Level {
+func NewLevel(width, height float64) *Level {
 	return &Level{
-		Platforms: []Platform{},
-		Score: 0,
+		Width:  width,
+		Height: height,
+		Blocks: make(map[string]bool),
 	}
 }
 
-// Setup a simple level geometry
-func (l *Level) AddPlatform(x, y, w, h float64) {
-	l.Platforms = append(l.Platforms, Platform{X: x, Y: y, Width: w, Height: h})
+// AddBlock adds a representation of a block to the level.
+func (l *Level) AddBlock(id string) {
+	l.Blocks[id] = true
 }
 
-// Placeholder collision check (very basic AABB check)
-func (l *Level) CheckCollision(p *Player) (Platform, bool, float64) {
-	for _, platform := range l.Platforms {
-		// AABB collision check
-		if p.Body.Position.X >= platform.X && p.Body.Position.X <= platform.X+platform.Width &&
-			p.Body.Position.Y >= platform.Y && p.Body.Position.Y <= platform.Y+platform.Height {
-			// Collision detected (Need to resolve this properly in a full system)
-			return platform, true, 0 // Return platform at collision point
-		}
+// CheckCollision is a placeholder for actual collision detection.
+func (l *Level) CheckCollision(pos physics.Vector2) bool {
+	// Very basic boundary check
+	if pos.X < 0 || pos.X >= l.Width || pos.Y < 0 || pos.Y >= l.Height {
+		return false
 	}
-	return Platform{}, false, 0
+	// In a real implementation, this checks against specific block geometry.
+	return true
 }
 
-// Placeholder for Score logic
-func (l *Level) AddScore(points int) {
-	l.Score += points
-	fmt.Printf("Score updated! Current Score: %d\n", l.Score)
+func main() {
+	fmt.Println("Level Module Loaded.")
+	// Initialize a sample level
+	gameLevel := NewLevel(800, 600)
+	gameLevel.AddBlock("ground")
+	gameLevel.AddBlock("block_A")
+	gameLevel.AddBlock("block_B")
+	fmt.Printf("Level initialized with %d blocks.\n", len(gameLevel.Blocks))
 }

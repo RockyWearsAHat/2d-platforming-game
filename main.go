@@ -2,61 +2,68 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 )
 
+// Mock update for the main execution flow
 func main() {
-	fmt.Println("RockyWearsAHat 2D Platformer Simulation Started")
+	fmt.Println("--- Starting RockyWearsAHat-2D Platformer Simulation ---")
 
-	// --- Setup ---
-	player := NewPlayer(100.0, 100.0)
-	level := NewLevel()
+	// 1. Initialize Game World
+	gameLevel := &Level{
+		Width:  800.0,
+		Height: 600.0,
+		Blocks: make(map[string]bool),
+	}
+	gameLevel.AddBlock("ground")
+	gameLevel.AddBlock("block_A")
+	gameLevel.AddBlock("block_B")
+	fmt.Printf("Level initialized: %s\n", gameLevel.Blocks)
 
-	// Setup level geometry
-	// Create a ground platform at Y=500
-	level.AddPlatform(0, 500, 800, 100)
+	// 2. Initialize Player
+	player := NewPlayer(1, "Rocky", 50.0, 50.0)
+	fmt.Printf("Player initialized: %s\n", player.String())
 
-	// --- Simulation Loop ---
-	dt := 1.0 / 60.0 // Target 60 FPS
+	// 3. Simulation Loop (Mocking time progression)
+	simDuration := 5 * time.Second
+	currentTime := time.Now()
+	lastTime := currentTime
 
-	fmt.Println("Starting simulation loop for 5 seconds...")
-	startTime := time.Now()
-	
-	for time.Since(startTime) < 5 * time.Second {
-		// 1. Input/Force Simulation (Simulate a jump mid-simulation if possible)
-		// In a real system, this is where input is read. We simulate a jump attempt here.
-		if player.Body.IsGrounded {
-			// Simulate input that attempts a jump occasionally
-			if time.Since(startTime).Seconds() > 1.5 && time.Since(startTime).Duration() < 2*time.Second {
-				player.Jump()
-			}
-		}
+	fmt.Println("\n--- Simulating Physics for 5 Seconds ---")
+
+	for time.Since(lastTime) < simDuration {
+		deltaTime := 1.0 / 60.0 // Simulate 60 FPS
 		
-		// 2. Physics Update
-		player.Update(dt)
-
-		// 3. Collision (Basic level check against the floor)
-		if player.Body.Position.Y >= 500 {
-			player.Body.Position.Y = 500.0
-			player.Body.Velocity.Y = 0
-			player.Body.IsGrounded = true
+		// Mock Player Input: Constant horizontal movement and occasional jump
+		inputX := 0.0
+		inputJump := false
+		
+		// Simulate movement: keep moving right and jump randomly
+		if time.Since(currentTime) > 2*time.Second {
+			inputX = 1.0 // Start moving right
+		}
+		if time.Since(currentTime) > 3*time.Second {
+			inputJump = true // Try to jump
 		}
 
-		// 4. Basic Logging (To observe state)
-		if int(time.Since(startTime).Seconds()*60) % 10 == 0 { // Log every 10 frames (approx 0.16s)
-			fmt.Printf("Time: %.2fs | Pos: (%.1f, %.1f) | VelY: %.1f | Grounded: %t\n", 
-				time.Since(startTime).Seconds(), 
-				player.Body.Position.X, 
-				player.Body.Position.Y, 
-				player.Body.Velocity.Y,
-				player.Body.IsGrounded)
+		player.Update(deltaTime, inputX, inputJump)
+
+		// Log state at the end of the frame
+		if int(time.Since(currentTime).Seconds()*10) % 10 == 0 { // Log every ~10 frames
+			fmt.Printf("Time: %.2fs | %s | Pos: (%.2f, %.2f) | Vel: (%.2f, %.2f) | Grounded: %t\n",
+				time.Since(currentTime).Seconds(),
+				player.Name,
+				player.Physics.Position.X,
+				player.Physics.Position.Y,
+				player.Physics.Velocity.X,
+				player.Physics.Velocity.Y,
+				player.Physics.IsGrounded)
 		}
 
-		time.Sleep(time.Duration(dt*1000*float64(time.Second)))
+		time.Sleep(time.Duration(deltaTime*float64(time.Second)))
+		lastTime = time.Now()
 	}
 
-	// --- Final State ---
-	fmt.Println("\nSimulation Finished.")
-	fmt.Printf("Final Player Position: (%.2f, %.2f)\n", player.Body.Position.X, player.Body.Position.Y)
-	fmt.Printf("Final Score: %d\n", level.Score)
+	fmt.Println("\n--- Simulation Complete ---")
 }
